@@ -23,6 +23,14 @@ def save_posts(posts):
         json.dump(posts, f, indent=4)
 
 
+def fetch_post_by_id(post_id):
+    """Return the post with the given id, or None if it does not exist."""
+    for post in load_posts():
+        if post["id"] == post_id:
+            return post
+    return None
+
+
 def generate_id(posts):
     """Generate a unique id: one more than the current highest id."""
     return max((p["id"] for p in posts), default=0) + 1
@@ -56,6 +64,25 @@ def delete(post_id):
     posts = [p for p in load_posts() if p["id"] != post_id]
     save_posts(posts)
     return redirect(url_for('index'))
+
+
+@app.route('/update/<int:post_id>', methods=['GET', 'POST'])
+def update(post_id):
+    post = fetch_post_by_id(post_id)
+    if post is None:
+        return "Post not found", 404
+
+    if request.method == 'POST':
+        posts = load_posts()
+        for p in posts:
+            if p["id"] == post_id:
+                p["author"] = request.form.get('author', '')
+                p["title"] = request.form.get('title', '')
+                p["content"] = request.form.get('content', '')
+        save_posts(posts)
+        return redirect(url_for('index'))
+
+    return render_template('update.html', post=post)
 
 
 if __name__ == '__main__':
