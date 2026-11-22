@@ -1,0 +1,7 @@
+masterblog.zip
+exercise2.md
+__pycache__/
+.idea/
+venv/
+.venv/
+.DS_Store
